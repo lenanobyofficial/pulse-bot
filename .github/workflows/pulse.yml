@@ -1,14 +1,14 @@
 name: Pulse Bot
 
 on:
-  schedule:
-    - cron: '0 3 * * *'
-
   workflow_dispatch:
 
 jobs:
   update-readme:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Repository
@@ -20,7 +20,8 @@ jobs:
           python-version: '3.12'
 
       - name: Install Dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install requests
 
       - name: Run Bot
         run: python main.py
@@ -31,6 +32,7 @@ jobs:
           git config --global user.email "actions@github.com"
 
           git add .
-          git commit -m "Daily Pulse Update" || echo "No changes"
+
+          git diff --cached --quiet || git commit -m "Daily Pulse Update"
 
           git push
